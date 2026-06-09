@@ -1,0 +1,6 @@
+{
+  "name": "元素探秘",
+  "description": "一个有趣且互动的游戏，用于学习元素周期表，特色包括元素测验和化合物合成挑战。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
