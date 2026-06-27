@@ -1,145 +1,165 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Dna, ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { ArrowLeft, Dna, ChevronUp, ChevronDown, Cuboid, Square } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { molecules, type Molecule } from '../data/molecules';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Sphere, Html } from '@react-three/drei';
+import * as THREE from 'three';
 
-function Molecule3D({ molecule }: { molecule: Molecule }) {
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef({ x: 0, y: 0 });
-  const rotationStart = useRef({ x: 0, y: 0 });
-  const requestRef = useRef<number>();
-  const timeRef = useRef<number>(0);
+const colorMap: Record<string, string> = {
+  'bg-red-500': '#ef4444',
+  'bg-slate-300': '#cbd5e1',
+  'bg-slate-700': '#334155',
+  'bg-blue-500': '#3b82f6',
+  'bg-purple-500': '#a855f7',
+  'bg-green-500': '#22c55e',
+  'bg-yellow-500': '#eab308'
+};
 
-  const animate = (time: number) => {
-    if (!isDragging) {
-      timeRef.current += 16; // approximate 60fps
-      setRotation(prev => ({
-        x: prev.x + 0.005,
-        y: prev.y + 0.01
-      }));
-    }
-    requestRef.current = requestAnimationFrame(animate);
-  };
-
-  useEffect(() => {
-    requestRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(requestRef.current!);
-  }, [isDragging]);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    setIsDragging(true);
-    dragStart.current = { x: e.clientX, y: e.clientY };
-    rotationStart.current = { ...rotation };
-    (e.target as Element).setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
-    const dx = e.clientX - dragStart.current.x;
-    const dy = e.clientY - dragStart.current.y;
-    setRotation({
-      x: rotationStart.current.x + dy * 0.01,
-      y: rotationStart.current.y + dx * 0.01
+function MoleculeCanvas3D({ molecule }: { molecule: Molecule }) {
+  const center = useMemo(() => {
+    let cx = 0, cy = 0, cz = 0;
+    molecule.structure.atoms.forEach(a => {
+      cx += a.x; cy += a.y; cz += (a.z || 0);
     });
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    setIsDragging(false);
-    (e.target as Element).releasePointerCapture(e.pointerId);
-  };
-
-  const cosX = Math.cos(rotation.x);
-  const sinX = Math.sin(rotation.x);
-  const cosY = Math.cos(rotation.y);
-  const sinY = Math.sin(rotation.y);
-
-  const projectedAtoms = molecule.structure.atoms.map(atom => {
-    const z0 = atom.z || 0;
-    const x1 = atom.x * cosY - z0 * sinY;
-    const z1 = atom.x * sinY + z0 * cosY;
-    const y2 = atom.y * cosX - z1 * sinX;
-    const z2 = atom.y * sinX + z1 * cosX;
-    
-    // Slightly weaker perspective for molecules
-    const perspective = 500 / (500 + z2);
-    
-    return {
-      ...atom,
-      px: x1 * perspective + 150,
-      py: y2 * perspective + 150,
-      pz: z2,
-      psize: Math.max(atom.size * perspective, 1),
-    };
-  });
-
-  const projectedBonds = molecule.structure.bonds.map(bond => {
-    const source = projectedAtoms[bond.source];
-    const target = projectedAtoms[bond.target];
-    const avgZ = (source.pz + target.pz) / 2;
-    return { ...bond, source, target, pz: avgZ };
-  });
-
-  const drawItems = [
-    ...projectedAtoms.map(a => ({ type: 'atom', item: a, z: a.pz })),
-    ...projectedBonds.map(b => ({ type: 'bond', item: b, z: b.pz }))
-  ].sort((a, b) => b.z - a.z);
-
-  const colorMap: Record<string, string> = {
-    'bg-red-500': '#ef4444',
-    'bg-slate-300': '#cbd5e1',
-    'bg-slate-700': '#334155',
-    'bg-blue-500': '#3b82f6',
-    'bg-purple-500': '#a855f7',
-    'bg-green-500': '#22c55e',
-    'bg-yellow-500': '#eab308'
-  };
+    const len = molecule.structure.atoms.length || 1;
+    return new THREE.Vector3(cx / len, cy / len, cz / len);
+  }, [molecule]);
 
   return (
-    <svg 
-      viewBox="0 0 300 300" 
-      className="w-full h-full p-4 drop-shadow-2xl overflow-visible touch-none cursor-grab active:cursor-grabbing"
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-    >
-      {drawItems.map((drawItem, idx) => {
-        if (drawItem.type === 'bond') {
-          const bond = drawItem.item as any;
-          return (
-            <g key={`bond-${idx}`}>
+    <Canvas camera={{ position: [0, 0, 200], fov: 45 }}>
+      <ambientLight intensity={0.6} />
+      <pointLight position={[100, 100, 100]} intensity={0.8} />
+      <directionalLight position={[-50, -50, 50]} intensity={0.4} />
+      <OrbitControls autoRotate autoRotateSpeed={1.5} enablePan={false} />
+      
+      <group position={[-center.x, -center.y, -center.z]}>
+        {/* Bonds */}
+        {molecule.structure.bonds.map((bond, idx) => {
+          const source = molecule.structure.atoms[bond.source];
+          const target = molecule.structure.atoms[bond.target];
+          
+          const start = new THREE.Vector3(source.x, source.y, source.z || 0);
+          const end = new THREE.Vector3(target.x, target.y, target.z || 0);
+          const distance = start.distanceTo(end);
+          const position = start.clone().lerp(end, 0.5);
+          
+          const quaternion = new THREE.Quaternion().setFromUnitVectors(
+            new THREE.Vector3(0, 1, 0),
+            end.clone().sub(start).normalize()
+          );
+
+          const drawCylinder = (offset: THREE.Vector3, i: number) => (
+            <mesh key={`bond-${idx}-${i}`} position={position.clone().add(offset)} quaternion={quaternion}>
+              <cylinderGeometry args={[3, 3, distance, 16]} />
+              <meshStandardMaterial color="#94a3b8" roughness={0.4} />
+            </mesh>
+          );
+
+          if (bond.type === 1) {
+            return drawCylinder(new THREE.Vector3(0,0,0), 0);
+          } else if (bond.type === 2) {
+            const dir = end.clone().sub(start).normalize();
+            let up = new THREE.Vector3(0, 1, 0);
+            if (Math.abs(dir.dot(up)) > 0.99) up = new THREE.Vector3(1, 0, 0);
+            const ortho = new THREE.Vector3().crossVectors(dir, up).normalize().multiplyScalar(5);
+            return (
+              <group key={`bond-${idx}`}>
+                {drawCylinder(ortho, 1)}
+                {drawCylinder(ortho.clone().negate(), 2)}
+              </group>
+            );
+          } else {
+            const dir = end.clone().sub(start).normalize();
+            let up = new THREE.Vector3(0, 1, 0);
+            if (Math.abs(dir.dot(up)) > 0.99) up = new THREE.Vector3(1, 0, 0);
+            const ortho = new THREE.Vector3().crossVectors(dir, up).normalize().multiplyScalar(7);
+            return (
+              <group key={`bond-${idx}`}>
+                {drawCylinder(new THREE.Vector3(0,0,0), 0)}
+                {drawCylinder(ortho, 1)}
+                {drawCylinder(ortho.clone().negate(), 2)}
+              </group>
+            );
+          }
+        })}
+
+        {/* Atoms */}
+        {molecule.structure.atoms.map((atom, idx) => (
+          <Sphere key={`atom-${idx}`} args={[atom.size, 32, 32]} position={[atom.x, atom.y, atom.z || 0]}>
+            <meshStandardMaterial color={colorMap[atom.color] || '#cbd5e1'} roughness={0.3} metalness={0.1} />
+            <Html center zIndexRange={[100, 0]} style={{ pointerEvents: 'none' }}>
+              <div 
+                className="text-white font-bold drop-shadow-md select-none" 
+                style={{ fontSize: `${atom.size * 0.8}px`, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+              >
+                {atom.symbol}
+              </div>
+            </Html>
+          </Sphere>
+        ))}
+      </group>
+    </Canvas>
+  );
+}
+
+function MoleculeCanvas2D({ molecule }: { molecule: Molecule }) {
+  const { viewBox } = useMemo(() => {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    molecule.structure.atoms.forEach(a => {
+      minX = Math.min(minX, a.x - a.size);
+      maxX = Math.max(maxX, a.x + a.size);
+      minY = Math.min(minY, a.y - a.size);
+      maxY = Math.max(maxY, a.y + a.size);
+    });
+    const width = maxX - minX + 80;
+    const height = maxY - minY + 80;
+    return { viewBox: `${minX - 40} ${minY - 40} ${width} ${height}` };
+  }, [molecule]);
+
+  return (
+    <svg viewBox={viewBox} className="w-full h-full p-4 drop-shadow-2xl max-w-xl max-h-xl mx-auto">
+      {/* Bonds */}
+      {molecule.structure.bonds.map((bond, idx) => {
+        const source = molecule.structure.atoms[bond.source];
+        const target = molecule.structure.atoms[bond.target];
+        return (
+          <g key={`bond-${idx}`}>
+            <line 
+              x1={source.x} y1={source.y} 
+              x2={target.x} y2={target.y} 
+              stroke="rgba(255,255,255,0.4)" 
+              strokeWidth={bond.type === 2 ? 12 : bond.type === 3 ? 18 : 6}
+              strokeLinecap="round"
+            />
+            {bond.type === 2 && (
               <line 
-                x1={bond.source.px} y1={bond.source.py} 
-                x2={bond.target.px} y2={bond.target.py} 
-                stroke="rgba(255,255,255,0.4)" 
-                strokeWidth={(bond.type === 2 ? 12 : bond.type === 3 ? 18 : 6) * ((bond.source.psize + bond.target.psize) / (bond.source.size + bond.target.size))}
+                x1={source.x} y1={source.y} 
+                x2={target.x} y2={target.y} 
+                stroke="#020617" 
+                strokeWidth={4}
                 strokeLinecap="round"
               />
-              {bond.type === 2 && (
-                <line 
-                  x1={bond.source.px} y1={bond.source.py} 
-                  x2={bond.target.px} y2={bond.target.py} 
-                  stroke="#020617" 
-                  strokeWidth={4 * ((bond.source.psize + bond.target.psize) / (bond.source.size + bond.target.size))}
-                  strokeLinecap="round"
-                />
-              )}
-            </g>
-          );
-        } else {
-          const atom = drawItem.item as any;
-          const color = colorMap[atom.color] || '#cbd5e1';
-          return (
-            <g key={`atom-${idx}`}>
-              <circle cx={atom.px} cy={atom.py} r={atom.psize} fill={color} opacity={1} />
-              <circle cx={atom.px - atom.psize * 0.3} cy={atom.py - atom.psize * 0.3} r={atom.psize * 0.4} fill="white" opacity={0.3} />
-              <text x={atom.px} y={atom.py} textAnchor="middle" dominantBaseline="central" fill="white" fontSize={atom.psize * 0.8} fontWeight="bold" opacity={0.9}>
-                {atom.symbol}
-              </text>
-            </g>
-          );
-        }
+            )}
+            {bond.type === 3 && (
+              <>
+                <line x1={source.x} y1={source.y} x2={target.x} y2={target.y} stroke="#020617" strokeWidth={4} strokeLinecap="round" />
+              </>
+            )}
+          </g>
+        )
+      })}
+      {/* Atoms */}
+      {molecule.structure.atoms.map((atom) => {
+        const color = colorMap[atom.color] || '#cbd5e1';
+        return (
+          <g key={`atom-${atom.id}`}>
+            <circle cx={atom.x} cy={atom.y} r={atom.size} fill={color} opacity={1} stroke="#1e293b" strokeWidth={2} />
+            <text x={atom.x} y={atom.y} textAnchor="middle" dominantBaseline="central" fill="white" fontSize={atom.size * 0.8} fontWeight="bold">
+              {atom.symbol}
+            </text>
+          </g>
+        )
       })}
     </svg>
   );
@@ -148,6 +168,7 @@ function Molecule3D({ molecule }: { molecule: Molecule }) {
 export function MoleculeView({ onBack }: { onBack: () => void }) {
   const [selectedMolecule, setSelectedMolecule] = useState<Molecule>(molecules[0]);
   const [isInfoExpanded, setIsInfoExpanded] = useState(true);
+  const [viewMode, setViewMode] = useState<'3D' | '2D'>('3D');
 
   return (
     <div className="flex flex-col h-full w-full bg-slate-950 text-white relative overflow-hidden">
@@ -164,6 +185,21 @@ export function MoleculeView({ onBack }: { onBack: () => void }) {
             <Dna className="w-5 h-5 text-purple-400" />
             分子图鉴
           </h2>
+        </div>
+        
+        <div className="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+          <button 
+            onClick={() => setViewMode('3D')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${viewMode === '3D' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+          >
+            <Cuboid className="w-4 h-4" /> 3D
+          </button>
+          <button 
+            onClick={() => setViewMode('2D')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${viewMode === '2D' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+          >
+            <Square className="w-4 h-4" /> 2D
+          </button>
         </div>
       </div>
 
@@ -202,23 +238,29 @@ export function MoleculeView({ onBack }: { onBack: () => void }) {
         <div className="flex-1 flex flex-col h-2/3 md:h-full relative overflow-hidden bg-slate-950">
           
           <div className="absolute inset-0 flex items-center justify-center">
-            {/* 3D-ish rendering using SVG */}
+            {/* 3D or 2D rendering */}
             <AnimatePresence mode="wait">
               <motion.div
-                key={selectedMolecule.id}
+                key={`${selectedMolecule.id}-${viewMode}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.1 }}
                 transition={{ type: "spring", damping: 20 }}
-                className="relative w-full h-full max-w-lg max-h-lg flex items-center justify-center"
+                className="relative w-full h-full max-w-2xl max-h-2xl flex items-center justify-center"
               >
-                <Molecule3D molecule={selectedMolecule} />
+                {viewMode === '3D' ? (
+                  <MoleculeCanvas3D molecule={selectedMolecule} />
+                ) : (
+                  <MoleculeCanvas2D molecule={selectedMolecule} />
+                )}
               </motion.div>
             </AnimatePresence>
             
-            <div className="absolute top-6 left-6 text-slate-500 text-xs flex items-center gap-2 animate-pulse pointer-events-none">
-              <span className="w-2 h-2 rounded-full bg-purple-500"></span> 拖拽模型旋转
-            </div>
+            {viewMode === '3D' && (
+              <div className="absolute top-6 left-6 text-slate-500 text-xs flex items-center gap-2 animate-pulse pointer-events-none">
+                <span className="w-2 h-2 rounded-full bg-purple-500"></span> 拖拽模型旋转 / 缩放
+              </div>
+            )}
           </div>
 
           {/* Info Card */}

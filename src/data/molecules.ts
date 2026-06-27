@@ -199,5 +199,99 @@ export const molecules: Molecule[] = [
         { source: 4, target: 6, type: 1 }
       ]
     }
+  },
+  {
+    id: "nh3",
+    name: "氨气",
+    formula: "NH₃",
+    description: "无色气体，有强烈的刺激气味。在常温下加压可以液化。用于制造氨水、氮肥、硝酸、铵盐等。",
+    category: "无机物",
+    structure: {
+      atoms: [
+        { id: 0, symbol: "N", x: 0, y: -20, z: 0, size: 40, color: "bg-blue-500" },
+        { id: 1, symbol: "H", x: -40, y: 30, z: 30, size: 25, color: "bg-slate-300" },
+        { id: 2, symbol: "H", x: 40, y: 30, z: 30, size: 25, color: "bg-slate-300" },
+        { id: 3, symbol: "H", x: 0, y: 30, z: -40, size: 25, color: "bg-slate-300" }
+      ],
+      bonds: [
+        { source: 0, target: 1, type: 1 },
+        { source: 0, target: 2, type: 1 },
+        { source: 0, target: 3, type: 1 }
+      ]
+    }
+  },
+  {
+    id: "c6h12o6",
+    name: "葡萄糖 (开链)",
+    formula: "C₆H₁₂O₆",
+    description: "自然界分布最广且最为重要的一种单糖。它是机体生命活动不可缺少的能量来源。",
+    category: "有机物",
+    structure: {
+      atoms: [
+        { id: 0, symbol: "C", x: 0, y: -100, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 1, symbol: "C", x: 0, y: -60, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 2, symbol: "C", x: 0, y: -20, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 3, symbol: "C", x: 0, y: 20, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 4, symbol: "C", x: 0, y: 60, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 5, symbol: "C", x: 0, y: 100, z: 0, size: 35, color: "bg-slate-700" },
+        // Aldehyde group on C1 (id: 0)
+        { id: 6, symbol: "O", x: 40, y: -110, z: 0, size: 40, color: "bg-red-500" },
+        { id: 7, symbol: "H", x: -40, y: -110, z: 0, size: 25, color: "bg-slate-300" },
+        // C2
+        { id: 8, symbol: "H", x: -40, y: -60, z: 20, size: 25, color: "bg-slate-300" },
+        { id: 9, symbol: "O", x: 40, y: -60, z: -20, size: 40, color: "bg-red-500" },
+        // C3 (inverted)
+        { id: 10, symbol: "O", x: -40, y: -20, z: -20, size: 40, color: "bg-red-500" },
+        { id: 11, symbol: "H", x: 40, y: -20, z: 20, size: 25, color: "bg-slate-300" },
+        // C4
+        { id: 12, symbol: "H", x: -40, y: 20, z: 20, size: 25, color: "bg-slate-300" },
+        { id: 13, symbol: "O", x: 40, y: 20, z: -20, size: 40, color: "bg-red-500" },
+        // C5
+        { id: 14, symbol: "H", x: -40, y: 60, z: 20, size: 25, color: "bg-slate-300" },
+        { id: 15, symbol: "O", x: 40, y: 60, z: -20, size: 40, color: "bg-red-500" },
+        // C6
+        { id: 16, symbol: "H", x: -40, y: 100, z: 20, size: 25, color: "bg-slate-300" },
+        { id: 17, symbol: "H", x: 40, y: 100, z: -20, size: 25, color: "bg-slate-300" },
+        { id: 18, symbol: "O", x: 0, y: 140, z: 0, size: 40, color: "bg-red-500" },
+      ],
+      bonds: [
+        { source: 0, target: 1, type: 1 },
+        { source: 1, target: 2, type: 1 },
+        { source: 2, target: 3, type: 1 },
+        { source: 3, target: 4, type: 1 },
+        { source: 4, target: 5, type: 1 },
+        { source: 0, target: 6, type: 2 },
+        { source: 0, target: 7, type: 1 },
+        { source: 1, target: 8, type: 1 },
+        { source: 1, target: 9, type: 1 },
+        { source: 2, target: 10, type: 1 },
+        { source: 2, target: 11, type: 1 },
+        { source: 3, target: 12, type: 1 },
+        { source: 3, target: 13, type: 1 },
+        { source: 4, target: 14, type: 1 },
+        { source: 4, target: 15, type: 1 },
+        { source: 5, target: 16, type: 1 },
+        { source: 5, target: 17, type: 1 },
+        { source: 5, target: 18, type: 1 },
+      ]
+    }
+  },
+  {
+    id: "o3",
+    name: "臭氧",
+    formula: "O₃",
+    description: "氧气的一种同素异形体，有鱼腥气味的淡蓝色气体，常用于消毒杀菌以及漂白剂。",
+    category: "无机物",
+    structure: {
+      atoms: [
+        { id: 0, symbol: "O", x: 0, y: -20, z: 0, size: 40, color: "bg-red-500" },
+        { id: 1, symbol: "O", x: -40, y: 30, z: 0, size: 40, color: "bg-red-500" },
+        { id: 2, symbol: "O", x: 40, y: 30, z: 0, size: 40, color: "bg-red-500" }
+      ],
+      bonds: [
+        { source: 0, target: 1, type: 2 },
+        { source: 0, target: 2, type: 1 } // Resonance structure representation
+      ]
+    }
   }
 ];
