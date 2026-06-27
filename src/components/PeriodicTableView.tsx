@@ -260,18 +260,34 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
                 </p>
               </div>
               
-              <div className="flex-1 flex flex-col justify-center min-h-0">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-4 h-full">
-                  {mnemonicGroups.map((group, idx) => (
-                    <div key={idx} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-3 flex flex-col justify-center items-center text-center">
-                      <h3 className="text-[10px] font-bold text-indigo-400/80 mb-2 font-mono bg-slate-900/50 px-2 py-0.5 rounded-md">
-                        {group.range}
-                      </h3>
-                      <p className="text-slate-200 font-bold text-sm tracking-widest break-keep">
-                        {group.text}
-                      </p>
-                    </div>
-                  ))}
+              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {mnemonicGroups.map((group, idx) => {
+                    const startAt = parseInt(group.range.split('-')[0]);
+                    const chars = group.text.split('');
+                    return (
+                      <div key={idx} className="bg-slate-800/50 hover:bg-slate-800/80 transition-colors border border-slate-700/50 rounded-2xl p-4 flex flex-col items-center shadow-md">
+                        <h3 className="text-xs font-bold text-indigo-400 mb-4 font-mono bg-slate-900/80 px-3 py-1 rounded-md border border-indigo-500/20">
+                          {group.range}
+                        </h3>
+                        <div className="flex w-full justify-between gap-1">
+                          {chars.map((char, charIdx) => {
+                            const element = elements.find(e => e.atomicNumber === startAt + charIdx);
+                            if (!element) return null;
+                            const pinyin = getPinyin(element.symbol);
+                            return (
+                              <div key={charIdx} className="flex flex-col items-center flex-1">
+                                <div className="text-[10px] text-slate-500 font-mono h-4 mb-1">{pinyin}</div>
+                                <div className="text-sm font-bold text-slate-200 mb-2">{element.name}</div>
+                                <div className="w-full h-px bg-slate-700/50 mb-2"></div>
+                                <div className="text-lg font-black text-indigo-400">{char}</div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </motion.div>
