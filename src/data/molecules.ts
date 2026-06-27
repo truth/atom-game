@@ -201,26 +201,6 @@ export const molecules: Molecule[] = [
     }
   },
   {
-    id: "nh3",
-    name: "氨气",
-    formula: "NH₃",
-    description: "无色气体，有强烈的刺激气味。在常温下加压可以液化。用于制造氨水、氮肥、硝酸、铵盐等。",
-    category: "无机物",
-    structure: {
-      atoms: [
-        { id: 0, symbol: "N", x: 0, y: -20, z: 0, size: 40, color: "bg-blue-500" },
-        { id: 1, symbol: "H", x: -40, y: 30, z: 30, size: 25, color: "bg-slate-300" },
-        { id: 2, symbol: "H", x: 40, y: 30, z: 30, size: 25, color: "bg-slate-300" },
-        { id: 3, symbol: "H", x: 0, y: 30, z: -40, size: 25, color: "bg-slate-300" }
-      ],
-      bonds: [
-        { source: 0, target: 1, type: 1 },
-        { source: 0, target: 2, type: 1 },
-        { source: 0, target: 3, type: 1 }
-      ]
-    }
-  },
-  {
     id: "c6h12o6",
     name: "葡萄糖 (开链)",
     formula: "C₆H₁₂O₆",

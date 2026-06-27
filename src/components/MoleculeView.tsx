@@ -31,32 +31,32 @@ function MoleculeCanvasClassic({ molecule }: { molecule: Molecule }) {
   }, [molecule]);
 
   const classicColorMap: Record<string, string> = {
-    'bg-red-500': '#ef4444', 
-    'bg-slate-300': '#93c5fd', // Light blue for Hydrogen
-    'bg-slate-700': '#64748b', // Slate for Carbon
-    'bg-blue-500': '#3b82f6', 
+    'bg-red-500': '#e34234', // Red for Oxygen
+    'bg-slate-300': '#98cceb', // Light blue for Hydrogen
+    'bg-slate-700': '#71808e', // Slate for Carbon
+    'bg-blue-500': '#0d47a1', // Dark blue for Nitrogen
     'bg-purple-500': '#64748b', 
     'bg-green-500': '#22c55e', 
     'bg-yellow-500': '#eab308' 
   };
 
   return (
-    <div className="w-full h-full bg-[#f4f9fc] flex flex-col items-center justify-center relative overflow-hidden rounded-xl border border-blue-200">
+    <div className="w-full h-full bg-[#ebf5f7] flex flex-col items-center justify-center relative overflow-hidden rounded-xl border border-cyan-200/50">
       {/* Grid background */}
       <div 
-        className="absolute inset-0 opacity-40 pointer-events-none" 
+        className="absolute inset-0 opacity-50 pointer-events-none" 
         style={{ 
-          backgroundImage: 'linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px)', 
-          backgroundSize: '30px 30px' 
+          backgroundImage: 'linear-gradient(#c6e1e6 1px, transparent 1px), linear-gradient(90deg, #c6e1e6 1px, transparent 1px)', 
+          backgroundSize: '25px 25px' 
         }} 
       />
       
       <svg viewBox={viewBox} className="w-full h-full p-4 drop-shadow-xl z-10 max-w-xl max-h-xl mx-auto">
         <defs>
-          <radialGradient id="classic-atom-grad" cx="40%" cy="40%" r="60%">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
-            <stop offset="50%" stopColor="rgba(255,255,255,0.1)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.3)" />
+          <radialGradient id="classic-atom-grad" cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.8)" />
+            <stop offset="40%" stopColor="rgba(255,255,255,0.1)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.5)" />
           </radialGradient>
         </defs>
         
@@ -69,22 +69,22 @@ function MoleculeCanvasClassic({ molecule }: { molecule: Molecule }) {
               <line 
                 x1={source.x} y1={source.y} 
                 x2={target.x} y2={target.y} 
-                stroke="#334155" 
-                strokeWidth={bond.type === 2 ? 14 : bond.type === 3 ? 20 : 8}
+                stroke="#2b3b4c" 
+                strokeWidth={bond.type === 2 ? 14 : bond.type === 3 ? 20 : 6}
                 strokeLinecap="round"
               />
               {bond.type === 2 && (
                 <line 
                   x1={source.x} y1={source.y} 
                   x2={target.x} y2={target.y} 
-                  stroke="#f4f9fc" 
+                  stroke="#ebf5f7" 
                   strokeWidth={6}
                   strokeLinecap="round"
                 />
               )}
               {bond.type === 3 && (
                 <>
-                  <line x1={source.x} y1={source.y} x2={target.x} y2={target.y} stroke="#f4f9fc" strokeWidth={6} strokeLinecap="round" />
+                  <line x1={source.x} y1={source.y} x2={target.x} y2={target.y} stroke="#ebf5f7" strokeWidth={6} strokeLinecap="round" />
                 </>
               )}
             </g>
@@ -95,9 +95,9 @@ function MoleculeCanvasClassic({ molecule }: { molecule: Molecule }) {
           const color = classicColorMap[atom.color] || '#cbd5e1';
           return (
             <g key={`atom-${atom.id}`}>
-              <circle cx={atom.x} cy={atom.y} r={atom.size} fill={color} stroke="#334155" strokeWidth={3} />
-              <circle cx={atom.x} cy={atom.y} r={atom.size - 1.5} fill="url(#classic-atom-grad)" />
-              <text x={atom.x} y={atom.y} textAnchor="middle" dominantBaseline="central" fill={['bg-slate-300', 'bg-yellow-500'].includes(atom.color) ? '#0f172a' : 'white'} fontSize={atom.size * 0.8} fontWeight="bold">
+              <circle cx={atom.x} cy={atom.y} r={atom.size} fill={color} stroke="#2b3b4c" strokeWidth={2.5} />
+              <circle cx={atom.x} cy={atom.y} r={atom.size - 1.25} fill="url(#classic-atom-grad)" />
+              <text x={atom.x} y={atom.y + atom.size * 0.05} textAnchor="middle" dominantBaseline="central" fill={['bg-slate-300', 'bg-yellow-500'].includes(atom.color) ? '#1e293b' : 'white'} fontSize={atom.size * 0.9} fontFamily="sans-serif">
                 {atom.symbol}
               </text>
             </g>
@@ -106,9 +106,9 @@ function MoleculeCanvasClassic({ molecule }: { molecule: Molecule }) {
       </svg>
       
       {/* Title block */}
-      <div className="absolute bottom-8 left-0 right-0 text-center z-10 flex flex-col items-center pointer-events-none">
-        <div className="text-slate-800 font-bold text-2xl drop-shadow-sm">{molecule.name}</div>
-        <div className="text-slate-700 font-mono text-xl">{molecule.formula}</div>
+      <div className="absolute bottom-6 left-0 right-0 text-center z-10 flex flex-col items-center pointer-events-none">
+        <div className="text-slate-800 text-3xl font-sans mb-1">{molecule.name}</div>
+        <div className="text-slate-700 font-sans text-2xl tracking-widest">{molecule.formula}</div>
       </div>
     </div>
   );

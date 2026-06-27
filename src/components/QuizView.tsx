@@ -13,6 +13,8 @@ export function QuizView({ onBack }: { onBack: () => void }) {
   const [status, setStatus] = useState<'playing' | 'correct' | 'wrong' | 'finished'>('playing');
   const [selectedElement, setSelectedElement] = useState<Element | null>(null);
   const [showHint, setShowHint] = useState(false);
+  const [hasRetried, setHasRetried] = useState(false);
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const maxRounds = 10;
 
   const startNewRound = () => {
@@ -35,10 +37,14 @@ export function QuizView({ onBack }: { onBack: () => void }) {
     setStatus('playing');
     setSelectedElement(null);
     setShowHint(false);
+    setHasRetried(false);
   };
 
   useEffect(() => {
     startNewRound();
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, [round]);
 
   const handleGuess = (element: Element) => {
@@ -48,13 +54,24 @@ export function QuizView({ onBack }: { onBack: () => void }) {
     if (element.atomicNumber === currentElement?.atomicNumber) {
       setStatus('correct');
       setScore(s => s + 10 + (showHint ? 0 : 5)); // Bonus for no hint
+      timeoutRef.current = setTimeout(() => {
+        setRound(r => r + 1);
+      }, 2000);
     } else {
       setStatus('wrong');
+      timeoutRef.current = setTimeout(() => {
+        setRound(r => r + 1);
+      }, 3000);
     }
+  };
 
-    setTimeout(() => {
-      setRound(r => r + 1);
-    }, 2000);
+  const handleRetry = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setStatus('playing');
+    setSelectedElement(null);
+    setHasRetried(true);
   };
 
   if (status === 'finished') {
@@ -177,7 +194,17 @@ export function QuizView({ onBack }: { onBack: () => void }) {
              <div className="absolute inset-0 bg-rose-900/90 flex flex-col items-center justify-center text-white backdrop-blur-sm z-20">
               <XCircle className="w-20 h-20 mb-4 text-rose-400" />
               <h3 className="text-3xl font-black uppercase">不正确！</h3>
-              <p className="mt-2 text-rose-200 font-medium">它是 {currentElement?.name}</p>
+              <p className="mt-2 text-rose-200 font-medium mb-6">它是 {currentElement?.name}</p>
+              {!hasRetried ? (
+                <button 
+                  onClick={handleRetry}
+                  className="px-6 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95 border border-rose-400"
+                >
+                  再给我一次机会
+                </button>
+              ) : (
+                <p className="text-rose-300 text-sm mt-2 font-medium">即将进入下一题...</p>
+              )}
             </div>
           )}
         </div>
