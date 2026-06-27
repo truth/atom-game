@@ -9,12 +9,121 @@ interface HomeViewProps {
 }
 
 export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTable }: HomeViewProps) {
+  // Generate random floating elements for background
+  const bgElements = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar'];
+  
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 h-full">
+    <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 h-full relative">
+      
+      {/* Outer Space Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-slate-950">
+        {/* Deep space radial gradient over the whole background */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black opacity-80"></div>
+        
+        {/* Nebula Glows */}
+        <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-indigo-900/10 rounded-full blur-[120px] mix-blend-screen mix-blend-lighten"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-emerald-900/10 rounded-full blur-[100px] mix-blend-screen mix-blend-lighten"></div>
+        <div className="absolute top-2/3 left-1/3 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[100px] mix-blend-screen mix-blend-lighten"></div>
+
+        {/* Stars */}
+        {Array.from({ length: 50 }).map((_, i) => (
+          <div 
+            key={`star-${i}`}
+            className="absolute rounded-full bg-white"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 2 + 1}px`,
+              height: `${Math.random() * 2 + 1}px`,
+              opacity: Math.random() * 0.8 + 0.2,
+              animation: `twinkle ${Math.random() * 4 + 2}s infinite alternate`
+            }}
+          />
+        ))}
+
+        {/* Solar System (Sun + 9 Planets) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 flex items-center justify-center opacity-80 mix-blend-screen">
+          {/* Sun */}
+          <div className="absolute w-[120px] h-[120px] rounded-full z-0 bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#fef08a_30%,_#f59e0b_70%,_#ea580c_100%)] shadow-[0_0_60px_20px_rgba(253,224,71,0.8),0_0_120px_40px_rgba(245,158,11,0.6),0_0_250px_80px_rgba(234,88,12,0.4)]" />
+          
+          {[
+            { name: 'Mercury', color: 'bg-stone-400', size: 8, distance: 80, speed: 15 },
+            { name: 'Venus', color: 'bg-orange-200', size: 14, distance: 130, speed: 25 },
+            { name: 'Earth', color: 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.6)]', size: 16, distance: 190, speed: 35 },
+            { name: 'Mars', color: 'bg-red-500', size: 12, distance: 250, speed: 45 },
+            { name: 'Jupiter', color: 'bg-orange-300', size: 36, distance: 360, speed: 70 },
+            { name: 'Saturn', color: 'bg-yellow-200 ring-[6px] ring-yellow-600/30', size: 28, distance: 480, speed: 95 },
+            { name: 'Uranus', color: 'bg-cyan-300', size: 20, distance: 580, speed: 130 },
+            { name: 'Neptune', color: 'bg-blue-600', size: 18, distance: 680, speed: 170 },
+            { name: 'Pluto', color: 'bg-slate-400', size: 6, distance: 760, speed: 220 },
+          ].map((planet, i) => (
+            <motion.div
+              key={planet.name}
+              className="absolute rounded-full border border-slate-700/40"
+              style={{
+                width: planet.distance * 2,
+                height: planet.distance * 2,
+              }}
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: planet.speed,
+                repeat: Infinity,
+                ease: "linear",
+                delay: -Math.random() * planet.speed // Random starting position
+              }}
+            >
+              <div 
+                className={`absolute rounded-full ${planet.color}`}
+                style={{
+                  width: planet.size,
+                  height: planet.size,
+                  top: -planet.size / 2,
+                  left: '50%',
+                  transform: 'translateX(-50%)'
+                }}
+              />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Decorative Floating Elements */}
+        {bgElements.map((el, i) => {
+
+          const size = Math.random() * 40 + 20;
+          return (
+            <motion.div
+              key={i}
+              initial={{ 
+                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000), 
+                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
+                opacity: 0,
+                scale: 0.5,
+              }}
+              animate={{ 
+                y: [null, Math.random() * -200 - 100],
+                opacity: [0, 0.8, 0],
+                scale: [0.5, 1, 0.5],
+                rotate: Math.random() * 360
+              }}
+              transition={{ 
+                duration: Math.random() * 10 + 10, 
+                repeat: Infinity,
+                ease: "linear",
+                delay: Math.random() * 10
+              }}
+              className="absolute text-white font-black font-mono border border-slate-400/50 rounded-xl flex items-center justify-center bg-slate-600/40 drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] brightness-125"
+              style={{ width: size, height: size, fontSize: size * 0.4 }}
+            >
+              {el}
+            </motion.div>
+          )
+        })}
+      </div>
+
       <motion.div 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="text-center mb-16"
+        className="text-center mb-16 relative z-10"
       >
         <div className="flex items-center justify-center gap-3 mb-4">
           <Atom className="w-16 h-16 text-indigo-500 animate-[spin_10s_linear_infinite]" />
@@ -30,10 +139,13 @@ export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTabl
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
           onClick={onSelectQuiz}
-          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-indigo-500 hover:bg-slate-800/80 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xl"
+          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-indigo-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xl hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] z-10"
         >
-          <div className="bg-indigo-600 p-4 rounded-2xl w-fit mb-6 text-white group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/20">
-            <Atom className="w-8 h-8" />
+          <div className="flex justify-between items-start mb-6">
+            <div className="bg-indigo-600 p-4 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/20">
+              <Atom className="w-8 h-8" />
+            </div>
+            <span className="bg-indigo-900/50 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-indigo-500/30">测验模式</span>
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">元素测验</h2>
           <p className="text-slate-400 mb-6 font-medium flex-1 text-sm leading-relaxed">
@@ -48,10 +160,13 @@ export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTabl
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
           onClick={onSelectSynthesis}
-          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-emerald-500 hover:bg-slate-800/80 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xl"
+          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-emerald-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xl hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] z-10"
         >
-          <div className="bg-emerald-600 p-4 rounded-2xl w-fit mb-6 text-white group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20">
-            <Beaker className="w-8 h-8" />
+          <div className="flex justify-between items-start mb-6">
+            <div className="bg-emerald-600 p-4 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20">
+              <Beaker className="w-8 h-8" />
+            </div>
+            <span className="bg-emerald-900/50 text-emerald-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-500/30">合成模式</span>
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">化合物合成</h2>
           <p className="text-slate-400 mb-6 font-medium flex-1 text-sm leading-relaxed">
@@ -66,10 +181,13 @@ export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTabl
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
           onClick={onSelectPeriodicTable}
-          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-blue-500 hover:bg-slate-800/80 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xl"
+          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-blue-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xl hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] z-10"
         >
-          <div className="bg-blue-600 p-4 rounded-2xl w-fit mb-6 text-white group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/20">
-            <FlaskConical className="w-8 h-8" />
+          <div className="flex justify-between items-start mb-6">
+            <div className="bg-blue-600 p-4 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/20">
+              <FlaskConical className="w-8 h-8" />
+            </div>
+            <span className="bg-blue-900/50 text-blue-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-blue-500/30">查阅模式</span>
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">元素周期表</h2>
           <p className="text-slate-400 mb-6 font-medium flex-1 text-sm leading-relaxed">

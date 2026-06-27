@@ -30,10 +30,10 @@ export function ElementCard({ element, onClick, className, style, selected }: El
       <span className="absolute top-1 right-1 md:right-2 text-[9px] md:text-xs font-bold opacity-80 leading-none">
         {element.atomicNumber}
       </span>
-      <span className="text-lg md:text-2xl font-black my-0 flex-1 flex items-center justify-center">
+      <span className="text-lg md:text-xl lg:text-2xl font-black my-0 flex-1 flex items-center justify-center drop-shadow-[0_0_8px_currentColor] brightness-125">
         {element.symbol}
       </span>
-      <span className="text-[10px] md:text-sm font-bold truncate w-full text-center opacity-90 leading-tight">
+      <span className="text-[8px] md:text-[10px] lg:text-xs font-bold truncate w-full text-center opacity-90 leading-tight">
         {element.name}
       </span>
     </motion.button>

@@ -207,7 +207,7 @@ export function SynthesisView({ onBack }: { onBack: () => void }) {
                                   status === 'success' ? "pointer-events-none" : "hover:border-rose-400 hover:bg-rose-500/20 cursor-pointer"
                               )}
                           >
-                              <span className="text-2xl font-black">{el.symbol}</span>
+                              <span className="text-3xl md:text-4xl font-black drop-shadow-[0_0_8px_currentColor] brightness-125">{el.symbol}</span>
                           </motion.button>
                       );
                   })}

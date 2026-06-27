@@ -128,21 +128,30 @@ export function QuizView({ onBack }: { onBack: () => void }) {
             <div className="flex gap-4 justify-center flex-wrap items-center mb-6 z-10 relative">
               <AnimatePresence>
                   {currentElement.clues.map((clue, idx) => {
-                    if (idx === 2 && !showHint) return null;
+                    if (idx > 1) return null; // We only show the first two clues, the 3rd one is often useless
                     return (
                       <motion.div 
                         key={`clue-${idx}`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={cn(
-                          "px-4 py-3 rounded-xl border text-sm font-medium shadow-sm max-w-[200px] text-left",
-                          idx === 2 ? "bg-amber-500/20 text-amber-200 border-amber-500/50" : "bg-slate-900/50 text-slate-300 border-slate-700"
-                        )}
+                        className="px-4 py-3 rounded-xl border text-sm font-medium shadow-sm max-w-[200px] text-left bg-slate-900/50 text-slate-300 border-slate-700"
                       >
                         {clue}
                       </motion.div>
                     )
                   })}
+                  {showHint && (
+                    <motion.div 
+                      key="hint-clue"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="px-4 py-3 rounded-xl border text-sm font-medium shadow-lg max-w-[200px] text-left bg-amber-500/20 text-amber-200 border-amber-500/50 flex flex-col gap-1"
+                    >
+                      <span className="text-[10px] uppercase font-bold text-amber-500/80">额外提示</span>
+                      <span>位于第 {currentElement.period} 周期</span>
+                      {currentElement.group > 0 && <span>第 {currentElement.group} 族</span>}
+                    </motion.div>
+                  )}
               </AnimatePresence>
             </div>
           )}
@@ -150,9 +159,9 @@ export function QuizView({ onBack }: { onBack: () => void }) {
           {!showHint && status === 'playing' && (
             <button 
               onClick={() => setShowHint(true)}
-              className="text-amber-400 font-bold text-xs uppercase tracking-widest flex items-center gap-2 mx-auto hover:text-amber-300 transition z-10 relative mt-auto bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-700"
+              className="text-amber-400 font-bold text-xs uppercase tracking-widest flex items-center gap-2 mx-auto hover:text-amber-300 hover:bg-slate-800 transition z-10 relative mt-auto bg-slate-900/80 px-5 py-3 rounded-xl border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)] active:scale-95"
             >
-              <Lightbulb className="w-4 h-4" /> 需要提示？ (潜在 -5 分)
+              <Lightbulb className="w-4 h-4" /> 获得提示 (增加一条有用信息)
             </button>
           )}
 
@@ -188,7 +197,7 @@ export function QuizView({ onBack }: { onBack: () => void }) {
             >
               <div className="text-xs font-bold text-slate-500 mb-1">原子序数 {option.atomicNumber}</div>
               <div className="flex gap-2 items-baseline mb-1">
-                 <div className="text-4xl font-black text-white">{option.symbol}</div>
+                 <div className="text-5xl font-black text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] brightness-125">{option.symbol}</div>
               </div>
               <div className="text-xs font-bold text-indigo-300 uppercase tracking-widest truncate w-full text-left">{option.name}</div>
             </button>

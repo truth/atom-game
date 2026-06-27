@@ -19,10 +19,10 @@ export default function App() {
         </div>
         
         <div className="flex gap-4 sm:gap-8 items-center">
-          <div className="text-center hidden sm:block">
-            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">当前关卡</p>
-            <p className="text-lg font-mono text-emerald-400">
-                {currentView === 'home' ? '01: 主菜单' : currentView === 'quiz' ? '02: 测验实验室' : currentView === 'synthesis' ? '03: 合成实验室' : '04: 资料库'}
+          <div className="text-center text-left sm:text-center">
+            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">当前模式</p>
+            <p className="text-sm sm:text-lg font-mono text-emerald-400 truncate max-w-[150px] sm:max-w-none">
+                {currentView === 'home' ? '主菜单' : currentView === 'quiz' ? '测验模式' : currentView === 'synthesis' ? '合成模式' : '周期表模式'}
             </p>
           </div>
           <div className="h-10 w-px bg-slate-700 hidden sm:block"></div>

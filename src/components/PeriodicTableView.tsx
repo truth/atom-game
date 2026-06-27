@@ -57,22 +57,44 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        <div className="flex-grow overflow-auto custom-scrollbar pr-2 pb-2">
+        <div className="flex-grow overflow-hidden pr-1 pb-1">
           <div 
-            className="grid gap-1 min-w-[800px] md:min-w-[1000px] mx-auto" 
+            className="grid gap-[2px] w-full h-full max-w-full max-h-full mx-auto" 
             style={{ 
-              gridTemplateColumns: 'repeat(18, minmax(0, 1fr))',
-              gridTemplateRows: 'repeat(10, minmax(0, 1fr))'
+              gridTemplateColumns: 'minmax(12px, 1.5rem) repeat(18, minmax(0, 1fr))',
+              gridTemplateRows: 'minmax(12px, 1.5rem) repeat(7, minmax(0, 1fr)) minmax(4px, 0.5rem) repeat(2, minmax(0, 1fr))'
             }}
           >
+            {/* Group numbers */}
+            {Array.from({ length: 18 }).map((_, i) => (
+              <div 
+                key={`group-${i + 1}`}
+                className="flex items-center justify-center text-[8px] md:text-[10px] font-bold text-slate-400"
+                style={{ gridColumnStart: i + 2, gridRowStart: 1 }}
+              >
+                {i + 1}
+              </div>
+            ))}
+            
+            {/* Period numbers */}
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div 
+                key={`period-${i + 1}`}
+                className="flex items-center justify-center text-[8px] md:text-[10px] font-bold text-slate-400"
+                style={{ gridColumnStart: 1, gridRowStart: i + 2 }}
+              >
+                {i + 1}
+              </div>
+            ))}
+
             {elements.map(el => (
               <ElementCard 
                 key={el.symbol} 
                 element={el} 
-                className={`w-full h-full min-h-[4.5rem] md:min-h-[5.5rem] !p-1 md:!p-2 ${el.period >= 8 ? 'mt-4' : ''}`}
+                className={`w-full h-full min-h-0 min-w-0 !p-0.5 md:!p-1`}
                 style={{ 
-                  gridColumnStart: el.group,
-                  gridRowStart: el.period
+                  gridColumnStart: el.group + 1,
+                  gridRowStart: el.period === 8 ? 10 : el.period === 9 ? 11 : el.period + 1
                 }}
                 onClick={() => setSelectedElement(el)}
                 selected={selectedElement?.symbol === el.symbol}
@@ -124,7 +146,7 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
                onPointerDown={(e) => dragControls.start(e)}
              >
                <div className="flex items-center gap-3 pointer-events-none">
-                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${getCategoryColor(selectedElement.category)}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shadow-[0_0_10px_currentColor] brightness-125 ${getCategoryColor(selectedElement.category)}`}>
                    {selectedElement.symbol}
                  </div>
                  <h3 className="font-bold text-slate-200">{selectedElement.name} <span className="text-slate-500 text-xs ml-2 font-normal hidden sm:inline">(拖拽此处移动)</span></h3>
