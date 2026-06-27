@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, Dna, ChevronUp, ChevronDown, Cuboid, Square } from 'lucide-react';
+import { ArrowLeft, Dna, ChevronUp, ChevronDown, Cuboid, Square, Map } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { molecules, type Molecule } from '../data/molecules';
 import { Canvas } from '@react-three/fiber';
@@ -15,6 +15,209 @@ const colorMap: Record<string, string> = {
   'bg-green-500': '#22c55e',
   'bg-yellow-500': '#eab308'
 };
+
+function MoleculeCanvasClassic({ molecule }: { molecule: Molecule }) {
+  const { viewBox } = useMemo(() => {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    molecule.structure.atoms.forEach(a => {
+      minX = Math.min(minX, a.x - a.size);
+      maxX = Math.max(maxX, a.x + a.size);
+      minY = Math.min(minY, a.y - a.size);
+      maxY = Math.max(maxY, a.y + a.size);
+    });
+    const width = maxX - minX + 160;
+    const height = maxY - minY + 200; // Extra room for label
+    return { viewBox: `${minX - 80} ${minY - 80} ${width} ${height}` };
+  }, [molecule]);
+
+  const classicColorMap: Record<string, string> = {
+    'bg-red-500': '#ef4444', 
+    'bg-slate-300': '#93c5fd', // Light blue for Hydrogen
+    'bg-slate-700': '#64748b', // Slate for Carbon
+    'bg-blue-500': '#3b82f6', 
+    'bg-purple-500': '#64748b', 
+    'bg-green-500': '#22c55e', 
+    'bg-yellow-500': '#eab308' 
+  };
+
+  return (
+    <div className="w-full h-full bg-[#f4f9fc] flex flex-col items-center justify-center relative overflow-hidden rounded-xl border border-blue-200">
+      {/* Grid background */}
+      <div 
+        className="absolute inset-0 opacity-40 pointer-events-none" 
+        style={{ 
+          backgroundImage: 'linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px)', 
+          backgroundSize: '30px 30px' 
+        }} 
+      />
+      
+      <svg viewBox={viewBox} className="w-full h-full p-4 drop-shadow-xl z-10 max-w-xl max-h-xl mx-auto">
+        <defs>
+          <radialGradient id="classic-atom-grad" cx="40%" cy="40%" r="60%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
+            <stop offset="50%" stopColor="rgba(255,255,255,0.1)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.3)" />
+          </radialGradient>
+        </defs>
+        
+        {/* Bonds */}
+        {molecule.structure.bonds.map((bond, idx) => {
+          const source = molecule.structure.atoms[bond.source];
+          const target = molecule.structure.atoms[bond.target];
+          return (
+            <g key={`bond-${idx}`}>
+              <line 
+                x1={source.x} y1={source.y} 
+                x2={target.x} y2={target.y} 
+                stroke="#334155" 
+                strokeWidth={bond.type === 2 ? 14 : bond.type === 3 ? 20 : 8}
+                strokeLinecap="round"
+              />
+              {bond.type === 2 && (
+                <line 
+                  x1={source.x} y1={source.y} 
+                  x2={target.x} y2={target.y} 
+                  stroke="#f4f9fc" 
+                  strokeWidth={6}
+                  strokeLinecap="round"
+                />
+              )}
+              {bond.type === 3 && (
+                <>
+                  <line x1={source.x} y1={source.y} x2={target.x} y2={target.y} stroke="#f4f9fc" strokeWidth={6} strokeLinecap="round" />
+                </>
+              )}
+            </g>
+          )
+        })}
+        {/* Atoms */}
+        {molecule.structure.atoms.map((atom) => {
+          const color = classicColorMap[atom.color] || '#cbd5e1';
+          return (
+            <g key={`atom-${atom.id}`}>
+              <circle cx={atom.x} cy={atom.y} r={atom.size} fill={color} stroke="#334155" strokeWidth={3} />
+              <circle cx={atom.x} cy={atom.y} r={atom.size - 1.5} fill="url(#classic-atom-grad)" />
+              <text x={atom.x} y={atom.y} textAnchor="middle" dominantBaseline="central" fill={['bg-slate-300', 'bg-yellow-500'].includes(atom.color) ? '#0f172a' : 'white'} fontSize={atom.size * 0.8} fontWeight="bold">
+                {atom.symbol}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+      
+      {/* Title block */}
+      <div className="absolute bottom-8 left-0 right-0 text-center z-10 flex flex-col items-center pointer-events-none">
+        <div className="text-slate-800 font-bold text-2xl drop-shadow-sm">{molecule.name}</div>
+        <div className="text-slate-700 font-mono text-xl">{molecule.formula}</div>
+      </div>
+    </div>
+  );
+}
+
+function MoleculeCanvasBlueprint({ molecule }: { molecule: Molecule }) {
+  const { viewBox } = useMemo(() => {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    molecule.structure.atoms.forEach(a => {
+      minX = Math.min(minX, a.x - a.size);
+      maxX = Math.max(maxX, a.x + a.size);
+      minY = Math.min(minY, a.y - a.size);
+      maxY = Math.max(maxY, a.y + a.size);
+    });
+    const width = maxX - minX + 160;
+    const height = maxY - minY + 200; // Extra room for label
+    return { viewBox: `${minX - 80} ${minY - 80} ${width} ${height}` };
+  }, [molecule]);
+
+  const blueprintColorMap: Record<string, string> = {
+    'bg-red-500': '#ef4444', 
+    'bg-slate-300': '#7dd3fc', 
+    'bg-slate-700': '#64748b', 
+    'bg-blue-500': '#3b82f6', 
+    'bg-purple-500': '#64748b', 
+    'bg-green-500': '#22c55e', 
+    'bg-yellow-500': '#eab308' 
+  };
+
+  return (
+    <div className="w-full h-full bg-[#e6f2f5] flex flex-col items-center justify-center relative overflow-hidden rounded-xl border border-blue-200">
+      {/* Grid background */}
+      <div 
+        className="absolute inset-0 opacity-30 pointer-events-none" 
+        style={{ 
+          backgroundImage: 'linear-gradient(#93c5fd 1px, transparent 1px), linear-gradient(90deg, #93c5fd 1px, transparent 1px)', 
+          backgroundSize: '20px 20px' 
+        }} 
+      />
+      <div 
+        className="absolute inset-0 opacity-20 pointer-events-none" 
+        style={{ 
+          backgroundImage: 'linear-gradient(#60a5fa 2px, transparent 2px), linear-gradient(90deg, #60a5fa 2px, transparent 2px)', 
+          backgroundSize: '100px 100px' 
+        }} 
+      />
+      
+      <svg viewBox={viewBox} className="w-full h-full p-4 drop-shadow-xl z-10 max-w-xl max-h-xl mx-auto">
+        <defs>
+          <radialGradient id="atom-grad" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.8)" />
+            <stop offset="50%" stopColor="rgba(255,255,255,0.2)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.4)" />
+          </radialGradient>
+        </defs>
+        
+        {/* Bonds */}
+        {molecule.structure.bonds.map((bond, idx) => {
+          const source = molecule.structure.atoms[bond.source];
+          const target = molecule.structure.atoms[bond.target];
+          return (
+            <g key={`bond-${idx}`}>
+              <line 
+                x1={source.x} y1={source.y} 
+                x2={target.x} y2={target.y} 
+                stroke="#334155" 
+                strokeWidth={bond.type === 2 ? 14 : bond.type === 3 ? 20 : 8}
+                strokeLinecap="round"
+              />
+              {bond.type === 2 && (
+                <line 
+                  x1={source.x} y1={source.y} 
+                  x2={target.x} y2={target.y} 
+                  stroke="#e6f2f5" 
+                  strokeWidth={6}
+                  strokeLinecap="round"
+                />
+              )}
+              {bond.type === 3 && (
+                <>
+                  <line x1={source.x} y1={source.y} x2={target.x} y2={target.y} stroke="#e6f2f5" strokeWidth={6} strokeLinecap="round" />
+                </>
+              )}
+            </g>
+          )
+        })}
+        {/* Atoms */}
+        {molecule.structure.atoms.map((atom) => {
+          const color = blueprintColorMap[atom.color] || '#cbd5e1';
+          return (
+            <g key={`atom-${atom.id}`}>
+              <circle cx={atom.x} cy={atom.y} r={atom.size} fill={color} stroke="#1e293b" strokeWidth={3} />
+              <circle cx={atom.x} cy={atom.y} r={atom.size - 1.5} fill="url(#atom-grad)" />
+              <text x={atom.x} y={atom.y} textAnchor="middle" dominantBaseline="central" fill={['bg-slate-300', 'bg-yellow-500'].includes(atom.color) ? '#0f172a' : 'white'} fontSize={atom.size * 0.8} fontWeight="bold">
+                {atom.symbol}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+      
+      {/* Title block */}
+      <div className="absolute bottom-8 left-0 right-0 text-center z-10 flex flex-col items-center pointer-events-none">
+        <div className="text-slate-800 font-bold text-2xl drop-shadow-sm">{molecule.name}</div>
+        <div className="text-slate-700 font-mono text-xl">{molecule.formula}</div>
+      </div>
+    </div>
+  );
+}
 
 function MoleculeCanvas3D({ molecule }: { molecule: Molecule }) {
   const center = useMemo(() => {
@@ -168,7 +371,7 @@ function MoleculeCanvas2D({ molecule }: { molecule: Molecule }) {
 export function MoleculeView({ onBack }: { onBack: () => void }) {
   const [selectedMolecule, setSelectedMolecule] = useState<Molecule>(molecules[0]);
   const [isInfoExpanded, setIsInfoExpanded] = useState(true);
-  const [viewMode, setViewMode] = useState<'3D' | '2D'>('3D');
+  const [viewMode, setViewMode] = useState<'3D' | '2D' | 'Blueprint' | 'Classic'>('3D');
 
   return (
     <div className="flex flex-col h-full w-full bg-slate-950 text-white relative overflow-hidden">
@@ -187,18 +390,30 @@ export function MoleculeView({ onBack }: { onBack: () => void }) {
           </h2>
         </div>
         
-        <div className="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+        <div className="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700 overflow-x-auto no-scrollbar">
           <button 
             onClick={() => setViewMode('3D')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${viewMode === '3D' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+            className={`px-3 py-1.5 whitespace-nowrap rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${viewMode === '3D' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
           >
             <Cuboid className="w-4 h-4" /> 3D
           </button>
           <button 
             onClick={() => setViewMode('2D')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${viewMode === '2D' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+            className={`px-3 py-1.5 whitespace-nowrap rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${viewMode === '2D' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
           >
-            <Square className="w-4 h-4" /> 2D
+            <Square className="w-4 h-4" /> 平面
+          </button>
+          <button 
+            onClick={() => setViewMode('Blueprint')}
+            className={`px-3 py-1.5 whitespace-nowrap rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${viewMode === 'Blueprint' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+          >
+            <Map className="w-4 h-4" /> 分子结构图
+          </button>
+          <button 
+            onClick={() => setViewMode('Classic')}
+            className={`px-3 py-1.5 whitespace-nowrap rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${viewMode === 'Classic' ? 'bg-amber-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+          >
+            <Map className="w-4 h-4" /> 分子结构式
           </button>
         </div>
       </div>
@@ -246,10 +461,14 @@ export function MoleculeView({ onBack }: { onBack: () => void }) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.1 }}
                 transition={{ type: "spring", damping: 20 }}
-                className="relative w-full h-full max-w-2xl max-h-2xl flex items-center justify-center"
+                className="relative w-full h-full max-w-2xl max-h-2xl flex items-center justify-center p-4 md:p-8"
               >
                 {viewMode === '3D' ? (
                   <MoleculeCanvas3D molecule={selectedMolecule} />
+                ) : viewMode === 'Blueprint' ? (
+                  <MoleculeCanvasBlueprint molecule={selectedMolecule} />
+                ) : viewMode === 'Classic' ? (
+                  <MoleculeCanvasClassic molecule={selectedMolecule} />
                 ) : (
                   <MoleculeCanvas2D molecule={selectedMolecule} />
                 )}
