@@ -5,7 +5,7 @@ export interface Molecule {
   description: string;
   category: string;
   structure: {
-    atoms: { id: number; symbol: string; x: number; y: number; size: number; color: string }[];
+    atoms: { id: number; symbol: string; x: number; y: number; z?: number; size: number; color: string }[];
     bonds: { source: number; target: number; type: 1 | 2 | 3 }[];
   };
 }
@@ -19,9 +19,9 @@ export const molecules: Molecule[] = [
     category: "无机物",
     structure: {
       atoms: [
-        { id: 0, symbol: "O", x: 150, y: 120, size: 40, color: "bg-red-500" },
-        { id: 1, symbol: "H", x: 90, y: 180, size: 25, color: "bg-slate-300" },
-        { id: 2, symbol: "H", x: 210, y: 180, size: 25, color: "bg-slate-300" }
+        { id: 0, symbol: "O", x: 0, y: -20, z: 0, size: 40, color: "bg-red-500" },
+        { id: 1, symbol: "H", x: -40, y: 30, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 2, symbol: "H", x: 40, y: 30, z: 0, size: 25, color: "bg-slate-300" }
       ],
       bonds: [
         { source: 0, target: 1, type: 1 },
@@ -37,9 +37,9 @@ export const molecules: Molecule[] = [
     category: "无机物",
     structure: {
       atoms: [
-        { id: 0, symbol: "C", x: 150, y: 150, size: 35, color: "bg-slate-700" },
-        { id: 1, symbol: "O", x: 70, y: 150, size: 40, color: "bg-red-500" },
-        { id: 2, symbol: "O", x: 230, y: 150, size: 40, color: "bg-red-500" }
+        { id: 0, symbol: "C", x: 0, y: 0, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 1, symbol: "O", x: -60, y: 0, z: 0, size: 40, color: "bg-red-500" },
+        { id: 2, symbol: "O", x: 60, y: 0, z: 0, size: 40, color: "bg-red-500" }
       ],
       bonds: [
         { source: 0, target: 1, type: 2 },
@@ -55,10 +55,10 @@ export const molecules: Molecule[] = [
     category: "无机物",
     structure: {
       atoms: [
-        { id: 0, symbol: "N", x: 150, y: 120, size: 40, color: "bg-blue-500" },
-        { id: 1, symbol: "H", x: 90, y: 180, size: 25, color: "bg-slate-300" },
-        { id: 2, symbol: "H", x: 150, y: 200, size: 25, color: "bg-slate-300" },
-        { id: 3, symbol: "H", x: 210, y: 180, size: 25, color: "bg-slate-300" }
+        { id: 0, symbol: "N", x: 0, y: -20, z: 0, size: 40, color: "bg-blue-500" },
+        { id: 1, symbol: "H", x: -40, y: 30, z: 30, size: 25, color: "bg-slate-300" },
+        { id: 2, symbol: "H", x: 40, y: 30, z: 30, size: 25, color: "bg-slate-300" },
+        { id: 3, symbol: "H", x: 0, y: 30, z: -40, size: 25, color: "bg-slate-300" }
       ],
       bonds: [
         { source: 0, target: 1, type: 1 },
@@ -75,17 +75,56 @@ export const molecules: Molecule[] = [
     category: "有机物",
     structure: {
       atoms: [
-        { id: 0, symbol: "C", x: 150, y: 150, size: 35, color: "bg-slate-700" },
-        { id: 1, symbol: "H", x: 150, y: 70, size: 25, color: "bg-slate-300" },
-        { id: 2, symbol: "H", x: 90, y: 190, size: 25, color: "bg-slate-300" },
-        { id: 3, symbol: "H", x: 210, y: 190, size: 25, color: "bg-slate-300" },
-        { id: 4, symbol: "H", x: 150, y: 210, size: 25, color: "bg-slate-300" }
+        { id: 0, symbol: "C", x: 0, y: 0, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 1, symbol: "H", x: 0, y: -50, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 2, symbol: "H", x: -40, y: 30, z: -30, size: 25, color: "bg-slate-300" },
+        { id: 3, symbol: "H", x: 40, y: 30, z: -30, size: 25, color: "bg-slate-300" },
+        { id: 4, symbol: "H", x: 0, y: 30, z: 50, size: 25, color: "bg-slate-300" }
       ],
       bonds: [
         { source: 0, target: 1, type: 1 },
         { source: 0, target: 2, type: 1 },
         { source: 0, target: 3, type: 1 },
         { source: 0, target: 4, type: 1 }
+      ]
+    }
+  },
+  {
+    id: "benzene",
+    name: "苯",
+    formula: "C₆H₆",
+    description: "一种碳氢化合物即最简单的芳烃，在常温下是甜味、可燃、有致癌毒性的无色透明液体，并带有强烈的芳香气味。",
+    category: "有机物",
+    structure: {
+      atoms: [
+        // C atoms (hexagon)
+        { id: 0, symbol: "C", x: 0, y: -50, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 1, symbol: "C", x: 43, y: -25, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 2, symbol: "C", x: 43, y: 25, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 3, symbol: "C", x: 0, y: 50, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 4, symbol: "C", x: -43, y: 25, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 5, symbol: "C", x: -43, y: -25, z: 0, size: 35, color: "bg-slate-700" },
+        // H atoms (outer hexagon)
+        { id: 6, symbol: "H", x: 0, y: -80, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 7, symbol: "H", x: 70, y: -40, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 8, symbol: "H", x: 70, y: 40, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 9, symbol: "H", x: 0, y: 80, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 10, symbol: "H", x: -70, y: 40, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 11, symbol: "H", x: -70, y: -40, z: 0, size: 25, color: "bg-slate-300" }
+      ],
+      bonds: [
+        { source: 0, target: 1, type: 2 },
+        { source: 1, target: 2, type: 1 },
+        { source: 2, target: 3, type: 2 },
+        { source: 3, target: 4, type: 1 },
+        { source: 4, target: 5, type: 2 },
+        { source: 5, target: 0, type: 1 },
+        { source: 0, target: 6, type: 1 },
+        { source: 1, target: 7, type: 1 },
+        { source: 2, target: 8, type: 1 },
+        { source: 3, target: 9, type: 1 },
+        { source: 4, target: 10, type: 1 },
+        { source: 5, target: 11, type: 1 }
       ]
     }
   },
@@ -97,15 +136,15 @@ export const molecules: Molecule[] = [
     category: "有机物",
     structure: {
       atoms: [
-        { id: 0, symbol: "C", x: 120, y: 150, size: 35, color: "bg-slate-700" },
-        { id: 1, symbol: "C", x: 180, y: 150, size: 35, color: "bg-slate-700" },
-        { id: 2, symbol: "O", x: 230, y: 110, size: 40, color: "bg-red-500" },
-        { id: 3, symbol: "H", x: 120, y: 90, size: 25, color: "bg-slate-300" },
-        { id: 4, symbol: "H", x: 70, y: 150, size: 25, color: "bg-slate-300" },
-        { id: 5, symbol: "H", x: 120, y: 210, size: 25, color: "bg-slate-300" },
-        { id: 6, symbol: "H", x: 180, y: 90, size: 25, color: "bg-slate-300" },
-        { id: 7, symbol: "H", x: 180, y: 210, size: 25, color: "bg-slate-300" },
-        { id: 8, symbol: "H", x: 270, y: 140, size: 25, color: "bg-slate-300" }
+        { id: 0, symbol: "C", x: -30, y: 0, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 1, symbol: "C", x: 30, y: 0, z: 0, size: 35, color: "bg-slate-700" },
+        { id: 2, symbol: "O", x: 80, y: -40, z: 0, size: 40, color: "bg-red-500" },
+        { id: 3, symbol: "H", x: -30, y: -50, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 4, symbol: "H", x: -70, y: 30, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 5, symbol: "H", x: -10, y: 40, z: 30, size: 25, color: "bg-slate-300" },
+        { id: 6, symbol: "H", x: 30, y: -40, z: 40, size: 25, color: "bg-slate-300" },
+        { id: 7, symbol: "H", x: 30, y: 50, z: 0, size: 25, color: "bg-slate-300" },
+        { id: 8, symbol: "H", x: 120, y: -10, z: 0, size: 25, color: "bg-slate-300" }
       ],
       bonds: [
         { source: 0, target: 1, type: 1 },
@@ -127,11 +166,37 @@ export const molecules: Molecule[] = [
     category: "无机物",
     structure: {
       atoms: [
-        { id: 0, symbol: "Na", x: 100, y: 150, size: 35, color: "bg-purple-500" },
-        { id: 1, symbol: "Cl", x: 200, y: 150, size: 45, color: "bg-green-500" }
+        { id: 0, symbol: "Na", x: -40, y: 0, z: 0, size: 35, color: "bg-purple-500" },
+        { id: 1, symbol: "Cl", x: 40, y: 0, z: 0, size: 45, color: "bg-green-500" }
       ],
       bonds: [
-        { source: 0, target: 1, type: 1 } // Ionic bond representation
+        { source: 0, target: 1, type: 1 }
+      ]
+    }
+  },
+  {
+    id: "h2so4",
+    name: "硫酸",
+    formula: "H₂SO₄",
+    description: "一种最活泼的二元无机强酸，能和绝大多数金属发生反应。高浓度的硫酸有强烈吸水性，可用作脱水剂。",
+    category: "无机物",
+    structure: {
+      atoms: [
+        { id: 0, symbol: "S", x: 0, y: 0, z: 0, size: 45, color: "bg-yellow-500" },
+        { id: 1, symbol: "O", x: 0, y: -50, z: 0, size: 40, color: "bg-red-500" },
+        { id: 2, symbol: "O", x: 0, y: 50, z: 0, size: 40, color: "bg-red-500" },
+        { id: 3, symbol: "O", x: -50, y: 0, z: 30, size: 40, color: "bg-red-500" },
+        { id: 4, symbol: "O", x: 50, y: 0, z: -30, size: 40, color: "bg-red-500" },
+        { id: 5, symbol: "H", x: -80, y: 0, z: 50, size: 25, color: "bg-slate-300" },
+        { id: 6, symbol: "H", x: 80, y: 0, z: -50, size: 25, color: "bg-slate-300" }
+      ],
+      bonds: [
+        { source: 0, target: 1, type: 2 },
+        { source: 0, target: 2, type: 2 },
+        { source: 0, target: 3, type: 1 },
+        { source: 0, target: 4, type: 1 },
+        { source: 3, target: 5, type: 1 },
+        { source: 4, target: 6, type: 1 }
       ]
     }
   }

@@ -22,7 +22,7 @@ export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTabl
   ];
   
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 h-full relative">
+    <div className="flex flex-col items-center justify-start w-full h-full relative overflow-y-auto custom-scrollbar overflow-x-hidden">
       
       {/* Toggle Cards Button */}
       <div className="absolute top-4 right-4 z-50">
@@ -143,11 +143,12 @@ export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTabl
         })}
       </div>
 
-      <motion.div 
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="text-center mb-16 relative z-10"
-      >
+      <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 min-h-full py-12 relative z-10">
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="text-center mb-8 sm:mb-12"
+        >
         <div className="flex items-center justify-center gap-3 mb-4">
           <Atom className="w-16 h-16 text-indigo-500 animate-[spin_10s_linear_infinite]" />
         </div>
@@ -251,6 +252,7 @@ export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTabl
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }
