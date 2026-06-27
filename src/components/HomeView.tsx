@@ -10,7 +10,13 @@ interface HomeViewProps {
 
 export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTable }: HomeViewProps) {
   // Generate random floating elements for background
-  const bgElements = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar'];
+  const bgElements = [
+    'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 
+    'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 
+    'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn',
+    'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y', 'Zr',
+    'Ag', 'Au', 'Pt', 'U', 'Pu'
+  ];
   
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 h-full relative">

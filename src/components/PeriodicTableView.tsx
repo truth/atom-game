@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import { elements, type Element } from '../data/elements';
+import { getPinyin, getMnemonic } from '../data/mnemonics';
 import { ElementCard } from './ElementCard';
 import { Atom3D } from './Atom3D';
 import { getCategoryColor } from '../lib/utils';
@@ -40,6 +41,7 @@ export const getNeutrons = (atomicNumber: number) => {
 
 export function PeriodicTableView({ onBack }: { onBack: () => void }) {
   const [selectedElement, setSelectedElement] = useState<Element | null>(null);
+  const [isMnemonicModalOpen, setIsMnemonicModalOpen] = useState(false);
   const dragControls = useDragControls();
 
   return (
@@ -51,9 +53,12 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
             交互式元素周期表
           </h2>
           <div className="flex flex-wrap justify-center gap-2">
-            <span className="px-3 py-1 bg-slate-700 rounded-full text-[10px] font-bold text-slate-300">活泼金属</span>
-            <span className="px-3 py-1 bg-indigo-600 rounded-full text-[10px] font-bold">稀有气体</span>
-            <span className="px-3 py-1 bg-slate-700 rounded-full text-[10px] font-bold text-slate-300">卤素</span>
+            <button 
+              onClick={() => setIsMnemonicModalOpen(true)}
+              className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-full text-xs font-bold shadow-[0_0_15px_rgba(79,70,229,0.3)] flex items-center gap-2"
+            >
+              🎤 查看速记歌
+            </button>
           </div>
         </div>
 
@@ -149,7 +154,11 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shadow-[0_0_10px_currentColor] brightness-125 ${getCategoryColor(selectedElement.category)}`}>
                    {selectedElement.symbol}
                  </div>
-                 <h3 className="font-bold text-slate-200">{selectedElement.name} <span className="text-slate-500 text-xs ml-2 font-normal hidden sm:inline">(拖拽此处移动)</span></h3>
+                 <h3 className="font-bold text-slate-200">
+                   {selectedElement.name} 
+                   <span className="text-slate-400 font-normal ml-2">({getPinyin(selectedElement.symbol)})</span>
+                   <span className="text-slate-500 text-xs ml-2 font-normal hidden sm:inline">(拖拽此处移动)</span>
+                 </h3>
                </div>
                <button 
                  onClick={() => setSelectedElement(null)}
@@ -186,6 +195,13 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
                       ))}
                     </ul>
                   </div>
+
+                  <div>
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700/50 pb-2">辅助记忆 (第 {selectedElement.period} 周期速记歌)</h4>
+                    <p className="text-sm text-slate-300 bg-slate-950/50 p-3 rounded-lg border border-slate-800 leading-relaxed font-mono">
+                      {getMnemonic(selectedElement.period)}
+                    </p>
+                  </div>
    
                   <div className="mt-auto grid grid-cols-2 gap-3 pt-6 border-t border-slate-700/50">
                      <div className="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
@@ -206,6 +222,55 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
                   <path d="M9 1L1 9M9 5L5 9M9 9H8.99" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
              </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isMnemonicModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsMnemonicModalOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-slate-900 border border-slate-700 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl overflow-y-auto max-h-[85vh]"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <span className="text-2xl">🎤</span> 元素周期表速记歌
+                </h2>
+                <button 
+                  onClick={() => setIsMnemonicModalOpen(false)}
+                  className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                  使用谐音记忆法，帮你快速记住各个周期的元素。拼音辅助标识了生僻字的读音。
+                </p>
+
+                {[1, 2, 3, 4, 5, 6, 7].map(period => (
+                  <div key={period} className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4">
+                    <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2">
+                      第 {period} 周期
+                    </h3>
+                    <p className="text-slate-300 font-mono text-sm leading-relaxed break-words">
+                      {getMnemonic(period)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
