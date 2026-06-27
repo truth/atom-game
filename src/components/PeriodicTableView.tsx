@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import { elements, type Element } from '../data/elements';
-import { getPinyin, getMnemonic } from '../data/mnemonics';
+import { getPinyin, getMnemonicGroup, mnemonicGroups } from '../data/mnemonics';
 import { ElementCard } from './ElementCard';
 import { Atom3D } from './Atom3D';
 import { getCategoryColor } from '../lib/utils';
@@ -197,9 +197,9 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
                   </div>
 
                   <div>
-                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700/50 pb-2">辅助记忆 (第 {selectedElement.period} 周期速记歌)</h4>
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700/50 pb-2">辅助记忆 (相邻元素)</h4>
                     <p className="text-sm text-slate-300 bg-slate-950/50 p-3 rounded-lg border border-slate-800 leading-relaxed font-mono">
-                      {getMnemonic(selectedElement.period)}
+                      {getMnemonicGroup(selectedElement.atomicNumber)}
                     </p>
                   </div>
    
@@ -232,7 +232,7 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsMnemonicModalOpen(false)}
           >
             <motion.div
@@ -240,9 +240,9 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-slate-900 border border-slate-700 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl overflow-y-auto max-h-[85vh]"
+              className="bg-slate-900 border border-slate-700 rounded-3xl p-6 md:p-8 w-full max-w-6xl shadow-2xl flex flex-col h-full max-h-[90vh] overflow-hidden"
             >
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-6 shrink-0">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                   <span className="text-2xl">🎤</span> 元素周期表速记歌
                 </h2>
@@ -254,21 +254,25 @@ export function PeriodicTableView({ onBack }: { onBack: () => void }) {
                 </button>
               </div>
 
-              <div className="space-y-6">
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                  使用谐音记忆法，帮你快速记住各个周期的元素。拼音辅助标识了生僻字的读音。
+              <div className="shrink-0 mb-6">
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  使用谐音记忆法，帮你快速记住所有元素。拼音辅助标识了生僻字的读音。按原子序号排列，每5个一组。
                 </p>
-
-                {[1, 2, 3, 4, 5, 6, 7].map(period => (
-                  <div key={period} className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4">
-                    <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2">
-                      第 {period} 周期
-                    </h3>
-                    <p className="text-slate-300 font-mono text-sm leading-relaxed break-words">
-                      {getMnemonic(period)}
-                    </p>
-                  </div>
-                ))}
+              </div>
+              
+              <div className="flex-1 flex flex-col justify-center min-h-0">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-4 h-full">
+                  {mnemonicGroups.map((group, idx) => (
+                    <div key={idx} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-3 flex flex-col justify-center items-center text-center">
+                      <h3 className="text-[10px] font-bold text-indigo-400/80 mb-2 font-mono bg-slate-900/50 px-2 py-0.5 rounded-md">
+                        {group.range}
+                      </h3>
+                      <p className="text-slate-200 font-bold text-sm tracking-widest break-keep">
+                        {group.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           </motion.div>
