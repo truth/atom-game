@@ -1,14 +1,17 @@
-import React from 'react';
-import { Beaker, FlaskConical, Atom } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { Beaker, FlaskConical, Atom, Dna, Eye, EyeOff } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface HomeViewProps {
   onSelectQuiz: () => void;
   onSelectSynthesis: () => void;
   onSelectPeriodicTable: () => void;
+  onSelectMolecule: () => void;
 }
 
-export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTable }: HomeViewProps) {
+export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTable, onSelectMolecule }: HomeViewProps) {
+  const [showCards, setShowCards] = useState(true);
+
   // Generate random floating elements for background
   const bgElements = [
     'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 
@@ -21,6 +24,20 @@ export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTabl
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 h-full relative">
       
+      {/* Toggle Cards Button */}
+      <div className="absolute top-4 right-4 z-50">
+        <button 
+          onClick={() => setShowCards(!showCards)}
+          className="flex items-center gap-2 px-3 py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-full backdrop-blur-md border border-slate-700 shadow-lg transition-colors text-xs font-bold"
+        >
+          {showCards ? (
+            <><EyeOff className="w-4 h-4" /> 隐藏卡片</>
+          ) : (
+            <><Eye className="w-4 h-4" /> 显示卡片</>
+          )}
+        </button>
+      </div>
+
       {/* Outer Space Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-slate-950">
         {/* Deep space radial gradient over the whole background */}
@@ -140,70 +157,100 @@ export function HomeView({ onSelectQuiz, onSelectSynthesis, onSelectPeriodicTabl
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onSelectQuiz}
-          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-indigo-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xl hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] z-10"
-        >
-          <div className="flex justify-between items-start mb-6">
-            <div className="bg-indigo-600 p-4 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/20">
-              <Atom className="w-8 h-8" />
-            </div>
-            <span className="bg-indigo-900/50 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-indigo-500/30">测验模式</span>
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-2">元素测验</h2>
-          <p className="text-slate-400 mb-6 font-medium flex-1 text-sm leading-relaxed">
-            在隔离舱中，通过原子线索和属性测试你对元素的了解。
-          </p>
-          <div className="text-indigo-400 font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-indigo-300">
-            开始学习 <span className="text-lg">&rarr;</span>
-          </div>
-        </motion.button>
+      <AnimatePresence>
+        {showCards && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-3xl"
+          >
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onSelectQuiz}
+              className="bg-slate-800 border border-slate-700 p-5 rounded-3xl text-left hover:border-indigo-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xl hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] z-10"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-indigo-600 p-3 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/20">
+                  <Atom className="w-6 h-6" />
+                </div>
+                <span className="bg-indigo-900/50 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-indigo-500/30">测验模式</span>
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">元素测验</h2>
+              <p className="text-slate-400 mb-4 font-medium flex-1 text-sm leading-relaxed">
+                在隔离舱中，通过原子线索和属性测试你对元素的了解。
+              </p>
+              <div className="text-indigo-400 font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-indigo-300">
+                开始学习 <span className="text-lg">&rarr;</span>
+              </div>
+            </motion.button>
 
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onSelectSynthesis}
-          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-emerald-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xl hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] z-10"
-        >
-          <div className="flex justify-between items-start mb-6">
-            <div className="bg-emerald-600 p-4 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20">
-              <Beaker className="w-8 h-8" />
-            </div>
-            <span className="bg-emerald-900/50 text-emerald-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-500/30">合成模式</span>
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-2">化合物合成</h2>
-          <p className="text-slate-400 mb-6 font-medium flex-1 text-sm leading-relaxed">
-            在反应堆中组合元素，合成水、盐和复杂分子。
-          </p>
-          <div className="text-emerald-400 font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-emerald-300">
-            开始合成 <span className="text-lg">&rarr;</span>
-          </div>
-        </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onSelectSynthesis}
+              className="bg-slate-800 border border-slate-700 p-5 rounded-3xl text-left hover:border-emerald-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xl hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] z-10"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-emerald-600 p-3 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20">
+                  <Beaker className="w-6 h-6" />
+                </div>
+                <span className="bg-emerald-900/50 text-emerald-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-500/30">合成模式</span>
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">化合物合成</h2>
+              <p className="text-slate-400 mb-4 font-medium flex-1 text-sm leading-relaxed">
+                在反应堆中组合元素，合成水、盐和复杂分子。
+              </p>
+              <div className="text-emerald-400 font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-emerald-300">
+                开始合成 <span className="text-lg">&rarr;</span>
+              </div>
+            </motion.button>
 
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onSelectPeriodicTable}
-          className="bg-slate-800 border border-slate-700 p-8 rounded-3xl text-left hover:border-blue-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xl hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] z-10"
-        >
-          <div className="flex justify-between items-start mb-6">
-            <div className="bg-blue-600 p-4 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/20">
-              <FlaskConical className="w-8 h-8" />
-            </div>
-            <span className="bg-blue-900/50 text-blue-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-blue-500/30">查阅模式</span>
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-2">元素周期表</h2>
-          <p className="text-slate-400 mb-6 font-medium flex-1 text-sm leading-relaxed">
-            查看完整的交互式元素周期表，具有3D模型和详细属性。
-          </p>
-          <div className="text-blue-400 font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-blue-300">
-            查看表格 <span className="text-lg">&rarr;</span>
-          </div>
-        </motion.button>
-      </div>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onSelectPeriodicTable}
+              className="bg-slate-800 border border-slate-700 p-5 rounded-3xl text-left hover:border-blue-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xl hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] z-10"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-blue-600 p-3 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/20">
+                  <FlaskConical className="w-6 h-6" />
+                </div>
+                <span className="bg-blue-900/50 text-blue-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-blue-500/30">查阅模式</span>
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">元素周期表</h2>
+              <p className="text-slate-400 mb-4 font-medium flex-1 text-sm leading-relaxed">
+                查看完整的交互式元素周期表，具有3D模型和详细属性。
+              </p>
+              <div className="text-blue-400 font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-blue-300">
+                查阅资料 <span className="text-lg">&rarr;</span>
+              </div>
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onSelectMolecule}
+              className="bg-slate-800 border border-slate-700 p-5 rounded-3xl text-left hover:border-purple-500 hover:bg-slate-800/90 transition-all group flex flex-col focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-xl hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] z-10"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-purple-600 p-3 rounded-2xl w-fit text-white group-hover:scale-110 transition-transform shadow-lg shadow-purple-500/20">
+                  <Dna className="w-6 h-6" />
+                </div>
+                <span className="bg-purple-900/50 text-purple-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-purple-500/30">图鉴模式</span>
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">分子图鉴</h2>
+              <p className="text-slate-400 mb-4 font-medium flex-1 text-sm leading-relaxed">
+                查看常见化学分子结构式，了解微观世界的构成。
+              </p>
+              <div className="text-purple-400 font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-purple-300">
+                查看结构 <span className="text-lg">&rarr;</span>
+              </div>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
